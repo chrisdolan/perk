@@ -1,0 +1,12 @@
+This is an implementation of the Java programming language. It is not
+intended to be an implementation of the Java virtual machine, however,
+so it will not be interoperable with existing JavaVM bytecode.
+
+The parser is heavily influenced by an ANTLR grammar for Java 1.5.
+
+   http://www.antlr.org/grammar/1152141644268/Java.g
+
+From those roots, though, it's been modified to be more tightly
+coupled with Parrot and has been enhanced to support more syntax from
+the Java Language Specification, 3rd edition to parse a wider variety
+of Java sources (i.e. Java 1.6 and beyond).
