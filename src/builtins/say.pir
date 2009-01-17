@@ -8,6 +8,13 @@ say.pir -- simple implementation of a say function
 
 .namespace []
 
+.sub '!create_class'
+    .param string name
+    $P0 = split '.', name
+    $P0 = newclass $P0
+    .return ($P0)
+.end
+
 .sub 'say'
     .param pmc args            :slurpy
     .local pmc iter
