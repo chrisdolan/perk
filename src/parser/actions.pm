@@ -21,56 +21,120 @@ value of the comment is passed as the second argument to the method.
 class perk::Grammar::Actions;
 
 method TOP($/) {
-   say('TOP');
-   make PAST::Block.new( :pirflags(':main') );
+   make $( $<compilationUnit> );
 }
+
 method compilationUnit($/) {
-   say('compilationUnit');
+    my $outer := PAST::Block.new( :node($/) );
+    if $<classOrInterfaceDeclaration> {
+        $outer.push($( $<classOrInterfaceDeclaration> ));
+    }
+    if $<typeDeclaration> {
+        for $<typeDeclaration> {
+            if $_<classOrInterfaceDeclaration> {
+                $outer.push($( $_<classOrInterfaceDeclaration> ));
+            }
+        }
+    }
+    make $outer;
 }
+
 method packageDeclaration($/) {
    say('package');
 }
+
 method annotation($/) {
    say('annot:');
    say($<annotationName>);
 }
+
 method importDeclaration($/) {
    say($/);
 }
+
+method classOrInterfaceDeclaration($/) {
+    if $<classDeclaration> {
+        make $( $<classDeclaration> );
+    }
+    else {
+        make $( $<interfaceDeclaration> );
+    }
+}
+
 method fieldDeclaration($/) {
    say('field:');
    say($/);
 }
+
 method methodDeclaration($/) {
    say('method:');
    say($<Identifier>);
 }
+
 method block($/) {
-   say('block:');
-   say($/);
+    my $statements := PAST::Stmts.new( :node($/) );
+    if $<blockStatement> {
+        for $<blockStatement> {
+            $statements.push($( $_ ));
+        }
+    }
+    make PAST::Block.new( $statements );
 }
+
 method expression($/) {
-   say('expression:');
-   say($/);
+    make PAST::Stmts.new();
 }
+
 method parExpression($/) {
    say('parExpression:');
    say($/);
 }
-method blockStatement($/) {
-   say('statement:');
-   say($<statement>);
+
+method blockStatement($/, $key) {
+   make $( $/{$key} );
 }
+
 method localVariableDeclaration($/) {
    say('local:');
    say($/);
 }
-method normalClassDeclaration($/, $key) {
-   if ($key eq 'start') {
-      say('class:');
-      say($<Identifier>);
-   }
+
+method classDeclaration($/, $key) {
+    make $( $/{$key} );
 }
+
+method normalClassDeclaration($/) {
+    my $class := $( $<classBody> );
+    $class.loadinit().push(
+        PAST::Op.new(
+            :pasttype('call'),
+            :name('!create_class'),
+            ~$<Identifier>
+        )
+    );
+    $class.namespace(~$<Identifier>);
+    make $class;
+}
+
+method classBody($/) {
+    my $body := PAST::Block.new( :node($/) );
+    for $<classBodyDeclaration> {
+        $body.push($( $_ ));
+    }
+    make $body;
+}
+
+method classBodyDeclaration($/, $key) {
+    if $key eq 'staticinit' {
+        my $block := $( $<block> );
+        $block.pirflags(':load :init');
+        make $block;
+    }
+    else {
+        make $( $<memberDecl> );
+    }
+}
+
 method arrayCreatorRest($/) {
    say('arrayCreatorRest, expr:');
    say($<expression>);
@@ -91,6 +155,35 @@ method switchLabel($/, $key) {
     say('default');
   }
 }
+
+method memberDecl($/, $key) {
+    my $past := $( $/{$key} );
+    if $<Identifier> {
+        $past.name(~$<Identifier>);
+    }
+    make $past;
+}
+
+method voidMethodDeclaratorRest($/) {
+    my $block := $( $<methodBody> );
+    # XXX Params
+    make $block;
+}
+
+method methodBody($/) {
+    make $( $<block> );
+}
+
+method statement($/) {
+    # XXX loads to fill out here
+    make $( $<statementExpression> );
+}
+
+method statementExpression($/) {
+    make $( $<expression> );
+}
+
+
 
 # Local Variables:
 #   mode: cperl

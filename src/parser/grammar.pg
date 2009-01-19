@@ -60,8 +60,8 @@ rule compilationUnit {
     | <annotation>+ [
       | <packageDeclaration> <importDeclaration>* <typeDeclaration>*
       | <classOrInterfaceDeclaration> <typeDeclaration>*
-    ]
-    | <packageDeclaration>? <importDeclaration>* <typeDeclaration>*
+    ] {*}
+    | <packageDeclaration>? <importDeclaration>* <typeDeclaration>* {*}
 }
 
 rule packageDeclaration {
@@ -78,7 +78,7 @@ rule typeDeclaration {
 }
 
 rule classOrInterfaceDeclaration {
-    <classOrInterfaceModifiers> [ <classDeclaration> | <interfaceDeclaration> ]
+    <classOrInterfaceModifiers> [ <classDeclaration> | <interfaceDeclaration> ] {*}
 }
 
 rule classOrInterfaceModifiers {
@@ -101,15 +101,16 @@ rule modifiers {
 }
 
 rule classDeclaration {
-    | <normalClassDeclaration>
-    | <enumDeclaration>
+    | <normalClassDeclaration> {*} #= normalClassDeclaration
+    | <enumDeclaration>        {*} #= enumDeclaration
 }
 
 rule normalClassDeclaration {
     'class' <Identifier> <typeParameters>?
     ['extends' <type>]?
-    ['implements' <typeList>]? {*} #= start
+    ['implements' <typeList>]?
     <classBody>
+    {*}
 }
 
 rule typeParameters {
@@ -159,7 +160,7 @@ rule typeList {
 }
 
 rule classBody {
-   '{' <classBodyDeclaration>* '}'
+   '{' <classBodyDeclaration>* '}' {*}
 }
 
 rule interfaceBody {
@@ -168,17 +169,17 @@ rule interfaceBody {
 
 rule classBodyDeclaration {
     | ';'
-    | 'static'? <block>
-    | <modifiers> <memberDecl>
+    | 'static'? <block>        {*} #= staticinit
+    | <modifiers> <memberDecl> {*} #= member
 }
 
 rule memberDecl {
-    | <genericMethodOrConstructorDecl>
-    | <memberDeclaration>
-    | 'void' <Identifier> <voidMethodDeclaratorRest>
-    | <Identifier> <constructorDeclaratorRest>
-    | <interfaceDeclaration>
-    | <classDeclaration>
+    | <genericMethodOrConstructorDecl>               {*} #= genericMethodOrConstructorDecl
+    | 'void' <Identifier> <voidMethodDeclaratorRest> {*} #= voidMethodDeclaratorRest
+    | <memberDeclaration>                            {*} #= memberDeclaration
+    | <Identifier> <constructorDeclaratorRest>       {*} #= constructorDeclaratorRest
+    | <interfaceDeclaration>                         {*} #= interfaceDeclaration
+    | <classDeclaration>                             {*} #= classDeclaration
 }
 
 rule memberDeclaration {
@@ -233,6 +234,7 @@ rule methodDeclaratorRest {
 rule voidMethodDeclaratorRest {
    <formalParameters> ['throws' <qualifiedNameList>]?
         [ <methodBody> | ';' ]
+   {*}
 }
 
 rule interfaceMethodDeclaratorRest {
@@ -365,7 +367,7 @@ rule formalParameterDeclsRest {
 }
 
 rule methodBody {
-   <block>
+   <block> {*}
 }
 
 rule constructorBody {
@@ -474,9 +476,9 @@ rule block {
 }
 
 rule blockStatement {
-    |   <localVariableDeclarationStatement>
-    |   <classOrInterfaceDeclaration>
-    |   <statement> {*}
+    |   <localVariableDeclarationStatement> {*} #= localVariableDeclarationStatement
+    |   <classOrInterfaceDeclaration>       {*} #= classOrInterfaceDeclaration
+    |   <statement>                         {*} #= statement
 }
 
 rule localVariableDeclarationStatement {
@@ -510,7 +512,7 @@ rule statement {
     |   'break'<!before \w> <Identifier>? ';'
     |   'continue'<!before \w> <Identifier>? ';'
     |   ';' 
-    |   <statementExpression> ';'
+    |   <statementExpression> ';' {*}
     |   <!before 'case'\s><Identifier> ':' <statement>
 }
 
@@ -540,8 +542,8 @@ rule switchBlockStatementGroup {
 
 rule switchLabel {
     |   'case' <constantExpression> ':' {*} #= normal
-    |   'case' <enumConstantName> ':' {*} #= enum
-    |   'default' ':' {*} #= default
+    |   'case' <enumConstantName> ':'   {*} #= enum
+    |   'default' ':'                   {*} #= default
 }
 
 rule forControl {
@@ -573,7 +575,7 @@ rule expressionList {
 }
 
 rule statementExpression {
-   <expression>
+   <expression> {*}
 }
 
 rule constantExpression {

@@ -54,11 +54,10 @@ BUILTINS_PIR = \
 perk.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o perk.pbc perk.pir
 
-src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg src/parser/grammar-oper.pg
+src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
 	    --output=src/gen_grammar.pir \
 	    src/parser/grammar.pg \
-	    src/parser/grammar-oper.pg \
 
 src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
