@@ -29,10 +29,13 @@ export MACOSX_DEPLOYMENT_TARGET := 10.4
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
 PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
-NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
+RAKUDO        = $(BUILD_DIR)/languages/rakudo/perl6.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 PMC_DIR       = src/pmc
+
+ACTION_COMPILER = $(BUILD_DIR)/compilers/nqp/nqp.pbc
+#ACTION_COMPILER = perl6.pbc
 
 all: perk.pbc
 
@@ -54,13 +57,17 @@ BUILTINS_PIR = \
 perk.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o perk.pbc perk.pir
 
+
+perl6.pbc:	$(RAKUDO)
+	$(CP) $< $@
+
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
 	    --output=src/gen_grammar.pir \
 	    src/parser/grammar.pg \
 
-src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
-	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
+src/gen_actions.pir: $(ACTION_COMPILER) $(PCT) src/parser/actions.pm
+	$(PARROT) $(PARROT_ARGS) $(ACTION_COMPILER) --output=src/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
 src/gen_builtins.pir: $(BUILTINS_PIR)

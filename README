@@ -1,3 +1,10 @@
++--------------------------------------------------------+
+| NOTE: I've moved development from googlecode to github |
++--------------------------------------------------------+
+See: http://github.com/chrisdolan/perk/tree/master
+   git clone git://github.com/chrisdolan/perk.git
+
+
 This is an implementation of the Java programming language. It is not
 intended to be an implementation of the Java virtual machine, however,
 so it will not be interoperable with existing JavaVM bytecode.

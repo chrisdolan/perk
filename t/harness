@@ -8,6 +8,6 @@ use warnings;
 use 5.008;
 
 use lib qw( . lib ../lib ../../lib ../../lib );
-use Parrot::Test::Harness language => 'perk',
-                          compiler => 'perk.pbc';
+use Parrot::Test::Harness language  => 'Perk',
+                          compiler  => 'perk.pbc';
 

@@ -1,14 +1,14 @@
 =head1 TITLE
 
-perk.pir - A perk compiler.
+perk.pir - A Java compiler targetting Parrot.
 
 =head2 Description
 
-This is the base file for the perk compiler.
+This is the base file for the Perk compiler.
 
 This file includes the parsing and grammar rules from
 the src/ directory, loads the relevant PGE libraries,
-and registers the compiler under the name 'perk'.
+and registers the compiler under the name 'Perk'.
 
 =head2 Functions
 
@@ -16,12 +16,12 @@ and registers the compiler under the name 'perk'.
 
 =item onload()
 
-Creates the perk compiler using a C<PCT::HLLCompiler>
+Creates the Perk compiler using a C<PCT::HLLCompiler>
 object.
 
 =cut
 
-.namespace [ 'perk';'Compiler' ]
+.namespace [ 'Perk';'Compiler' ]
 
 .loadlib 'perk_group'
 
@@ -30,22 +30,22 @@ object.
 
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
-    $P1.'language'('perk')
-    $P1.'parsegrammar'('perk::Grammar')
-    $P1.'parseactions'('perk::Grammar::Actions')
+    $P1.'language'('Perk')
+    $P1.'parsegrammar'('Perk::Grammar')
+    $P1.'parseactions'('Perk::Grammar::Actions')
 .end
 
 =item main(args :slurpy)  :main
 
 Start compilation by passing any command line C<args>
-to the perk compiler.
+to the Perk compiler.
 
 =cut
 
 .sub 'main' :main
     .param pmc args
 
-    $P0 = compreg 'perk'
+    $P0 = compreg 'Perk'
     $P1 = $P0.'command_line'(args)
 .end
 

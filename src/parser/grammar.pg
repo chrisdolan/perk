@@ -36,7 +36,7 @@ This is the grammar for perk written as a sequence of Perl 6 rules.
 
 =end overview
 
-grammar perk::Grammar is PCT::Grammar;
+grammar Perk::Grammar is PCT::Grammar;
 
 rule TOP {
     <compilationUnit>

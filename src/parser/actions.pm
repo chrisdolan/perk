@@ -2,11 +2,7 @@
 
 =begin comments
 
-perk::Grammar::Actions - ast transformations for perk
-
-********
-THIS INITIAL VERSION IS PURELY DEBUG CODE!  There is no real implementation here yet...
-********
+Perk::Grammar::Actions - ast transformations for perk
 
 This file contains the methods that are used by the parse grammar
 to build the PAST representation of an perk program.
@@ -18,7 +14,7 @@ value of the comment is passed as the second argument to the method.
 
 =end comments
 
-class perk::Grammar::Actions;
+class Perk::Grammar::Actions;
 
 method TOP($/) {
    make $( $<compilationUnit> );
@@ -182,8 +178,6 @@ method statement($/) {
 method statementExpression($/) {
     make $( $<expression> );
 }
-
-
 
 # Local Variables:
 #   mode: cperl
