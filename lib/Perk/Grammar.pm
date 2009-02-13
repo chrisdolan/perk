@@ -805,7 +805,7 @@ token UnicodeEscape { '\\u' <HexDigit>**{4} }
 token ENUM { 'enum'<!before \w> }
 token ASSERT { 'assert'<!before \w> }
 
-token Identifier { <!before <keyword>\W><.ident> }
+token Identifier { <!before <Perk::Grammar::keyword>\W><.ident> }
 token keyword {
         # from http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.9
         'abstract'    | 'continue'    | 'for'           | 'new'          | 'switch'

@@ -2,7 +2,7 @@
 
 =head1
 
-say.pir -- simple implementation of a say function
+Perk::Builtins -- compiler helper routines
 
 =cut
 

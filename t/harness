@@ -1,13 +1,32 @@
 #! perl
 
-# $Id$
+# 1) Find all of the t/**/*.java files that have "public static void main"
+# 2) Compile and run them
 
-# pragmata
 use strict;
 use warnings;
 use 5.008;
 
 use lib qw( . lib ../lib ../../lib ../../lib );
-use Parrot::Test::Harness language  => 'Perk',
-                          compiler  => 'perk.pbc';
+use File::Find qw(find);
+use File::Spec;
 
+my @tests;
+find({wanted => sub {
+   return unless m/\.java\z/;
+   if (open my $fh, '<', $_) {
+      while (my $line = <$fh>) {
+         if ($line =~ m/\b public [ ] static [ ] void [ ] main \b/x) {
+            push @tests, $_;
+            last;
+         }
+      }
+      close $fh;
+   }
+}, no_chdir => 1}, 't');
+
+my $parrot = File::Spec->catfile('..', '..', 'parrot');
+for my $test (sort @tests) {
+   print "==== $test ====\n";
+   system($parrot, 'perk.pbc', $test);
+}
