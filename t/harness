@@ -28,5 +28,7 @@ find({wanted => sub {
 my $parrot = File::Spec->catfile('..', '..', 'parrot');
 for my $test (sort @tests) {
    print "==== $test ====\n";
-   system($parrot, 'perk.pbc', $test);
+   my @cmd = ($parrot, 'perk.pbc', @ARGV, $test);
+   print "  cmd: @cmd\n";
+   system(@cmd);
 }

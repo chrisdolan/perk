@@ -12,23 +12,30 @@ PM	  = $(shell ls lib/Perk/*.pm lib/Perk/*/*.pm)
 PIR       = $(PM:.pm=.pir)
 PBC       = $(PM:.pm=.pbc) $(T:.t=.pbc)
 
-all:    check prebuild build
+all:    build
 
 check:
 	@ [ -e $(PARROT) ] || ( echo "Missing $(PARROT)" ; exit 1 )
 
-prebuild:       $(PIR)
+prebuild:       check $(PIR)
 
-build:	perk.pbc
+build:	prebuild perk.pbc
 perk.pir:	perk.pl
 	$(PERL6) --target=pir --output=$@ $<
+
 #perk.pbc:	perk.pir $(PERL6PBC) $(PCTPBC)
 #	$(PARROT) -o perk_tmp.pbc perk.pir
 #	$(MERGEPBC) -o $@ perk_tmp.pbc $(PERL6PBC) $(PCTPBC)
 #	$(RM) perk_tmp.pbc
 
-test:	all
+test:	build
 	$(ENV) perl t/harness
+test-parse:	build
+	$(ENV) perl t/harness --target=parse
+test-past:	build
+	$(ENV) perl t/harness --target=past
+test-pir:	build
+	$(ENV) perl t/harness --target=pir
 
 clean:  cleanpir cleanpbc
 cleanpir:
@@ -41,6 +48,4 @@ cleanpbc:
 %.pbc:  %.pir
 	$(PARROT) -o $@ $<
 
-.PHONY: all check test clean cleanpir cleanpbc test_trace gdb
-
-
+.PHONY: all check test test-parse test-pir test-past build prebuild clean cleanpir cleanpbc
