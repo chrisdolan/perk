@@ -29,6 +29,7 @@ my $parrot = File::Spec->catfile('..', '..', 'parrot');
 for my $test (sort @tests) {
    print "==== $test ====\n";
    my @cmd = ($parrot, 'perk.pbc', @ARGV, $test);
+   #print "  cmd: env PERL6LIB=$ENV{PERL6LIB} @cmd\n";
    print "  cmd: @cmd\n";
    system(@cmd);
 }
