@@ -16,6 +16,9 @@ value of the comment is passed as the second argument to the method.
 
 class Perk::Grammar::Actions;
 
+our @package;
+our @classes;
+
 method TOP($/) {
    make $( $<compilationUnit> );
 }
@@ -36,7 +39,8 @@ method compilationUnit($/) {
 }
 
 method packageDeclaration($/) {
-   say('package');
+    my $package = ~$<package>;
+    @package = $package.split('.');
 }
 
 method annotation($/) {
@@ -99,17 +103,41 @@ method classDeclaration($/, $key) {
     make $( $/{$key} );
 }
 
-method normalClassDeclaration($/) {
-    my $class := $( $<classBody> );
-    $class.loadinit().push(
-        PAST::Op.new(
-            :pasttype('call'),
-            :name('!create_class'),
-            ~$<Identifier>
-        )
-    );
-    $class.namespace(~$<Identifier>);
-    make $class;
+method normalClassDeclaration($/, $key) {
+    if $key eq 'start' {
+        my @ns = self._compute_local_ns(~$<Identifier>);
+        @classes.push(@ns.join('.'));
+    } else {
+        @classes.pop;
+        my @ns = self._compute_local_ns(~$<Identifier>);
+        my $classname = @ns.join('.');
+        my $class := $( $<classBody> );
+        $class.loadinit().push(
+            PAST::Op.new(
+                :pasttype('call'),
+                :name('!create_class'),
+                $classname
+            )
+        );
+        $class.namespace(@ns);
+        make $class;
+    }
+}
+method _compute_local_ns(Str $name) {
+    my @ns;
+    if $name ~~ m/\./ {
+        # Fully qualified class
+        @ns = $name.split('.');
+    } elsif @classes.elems > 0 {
+        # Inner class
+        @ns = @classes[*-1].split('.');
+        @ns.push($name);
+    } else {
+        # Prepend package
+        @ns = @package;
+        @ns.push($name);
+    }
+    return @ns;
 }
 
 method classBody($/) {

@@ -65,7 +65,7 @@ rule compilationUnit {
 }
 
 rule packageDeclaration {
-    'package' <qualifiedName> ';'
+    'package' $<package>=[<qualifiedName>] ';' {*}
 }
 
 rule importDeclaration {
@@ -109,8 +109,9 @@ rule normalClassDeclaration {
     'class' <Identifier> <typeParameters>?
     ['extends' <type>]?
     ['implements' <typeList>]?
+    {*} #= start
     <classBody>
-    {*}
+    {*} #= end
 }
 
 rule typeParameters {
