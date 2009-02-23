@@ -1,5 +1,7 @@
 PERL      = perl
-PARROTDIR = ../..
+
+# Look for parrot in sibling Rakudo subdir, or own subdir, or up two (indicating we're in parrot/languages/perk)
+PARROTDIR = $(shell $(PERL) -le'print -e "../rakudo/parrot/parrot" ? "../rakudo/parrot" : -e "parrot/parrot" ? "parrot" : "../.."')
 PARROT    = $(PARROTDIR)/parrot
 MERGEPBC  = $(PARROTDIR)/pbc_merge
 PCTDIR    = $(PARROTDIR)/runtime/parrot/library
@@ -28,14 +30,16 @@ perk.pir:	$(PIR) perk.pl $(PERL6PBC)
 $(PERL6PBC):	$(PERL6DIR)/perl6.pbc Makefile
 	$(CP) $< $@
 
+TEST_HARNESS = $(ENV) PARROTEXE=$(PARROT) $(PERL) t/harness
+
 test:	build
-	$(ENV) $(PERL) t/harness
+	$(TEST_HARNESS)
 test-parse:	build
-	$(ENV) $(PERL) t/harness --target=parse
+	$(TEST_HARNESS) --target=parse
 test-past:	build
-	$(ENV) $(PERL) t/harness --target=past
+	$(TEST_HARNESS) --target=past
 test-pir:	build
-	$(ENV) $(PERL) t/harness --target=pir
+	$(TEST_HARNESS) --target=pir
 
 clean:
 	$(RM) $(PIR) $(PBC) perk.pbc perk.pir perl6.pbc

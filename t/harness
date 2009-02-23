@@ -7,9 +7,10 @@ use strict;
 use warnings;
 use 5.008;
 
-use lib qw( . lib ../lib ../../lib ../../lib );
 use File::Find qw(find);
 use File::Spec;
+
+my $parrot = $ENV{PARROTEXE} || File::Spec->catfile('..', '..', 'parrot');
 
 my @tests;
 find({wanted => sub {
@@ -25,11 +26,9 @@ find({wanted => sub {
    }
 }, no_chdir => 1}, 't');
 
-my $parrot = File::Spec->catfile('..', '..', 'parrot');
 for my $test (sort @tests) {
    print "==== $test ====\n";
    my @cmd = ($parrot, 'perk.pbc', @ARGV, $test);
-   #print "  cmd: env PERL6LIB=$ENV{PERL6LIB} @cmd\n";
    print "  cmd: @cmd\n";
    system(@cmd);
 }
